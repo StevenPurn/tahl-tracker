@@ -1,1 +1,0 @@
----`nlayout: default`ntitle: "Example Game for Testing"`nteams: ["Honey Badgers", "Killer Goats"]`ndate: 2026-05-18`ndivision: "Adult Div 3"`nseason: "Spring 2026"`n---`n`n# This is a test article`n`nContent goes here.
