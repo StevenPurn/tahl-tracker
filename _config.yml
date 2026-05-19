@@ -2,9 +2,3 @@ title: TAHL Tracker
 baseurl: ''
 url: ''
 markdown: kramdown
-theme: jekyll-theme-cayman
-# To use custom collections if needed
-collections:
-  games:
-    output: true
-    directory: articles/games
