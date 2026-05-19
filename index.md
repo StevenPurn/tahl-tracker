@@ -1,1 +1,33 @@
----`nlayout: default`ntitle: "Latest News"`n---`n`n<div class="max-w-4xl mx-auto">`n  <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">`n    <h2 class="text-3xl font-black uppercase italic text-gray-800">Latest Game Reports</h2>`n    <a href="teams.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors uppercase tracking-tight">`n      Filter by Team`n    </a>`n  </div>`n`n  <div class="grid gap-6">`n    {% for post in site.posts limit:10 %}`n      <a href="{{ post.url | relative_url }}" class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">`n        <div class="p-6">`n          <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase">`n            <span>{{ post.division | default: "Adult League" }}</span>`n            <span class="text-gray-400">{{ post.date | date: "%B %d, %Y" }}</span>`n          </div>`n          <h3 class="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">`n            {{ post.title }}`n          </h3>`n        </div>`n      </a>`n    {% else %}`n      <div class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">`n        <p class="text-gray-400 font-medium italic">No articles found. Sync the server to generate reports!</p>`n      </div>`n    {% endfor %}`n  </div>`n</div>
+---
+layout: default
+title: "Latest News"
+---
+
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+    <h2 class="text-3xl font-black uppercase italic text-gray-800">Latest Game Reports</h2>
+    <a href="teams.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors uppercase tracking-tight">
+      Filter by Team
+    </a>
+  </div>
+
+  <div class="grid gap-6">
+    {% for post in site.posts limit:10 %}
+      <a href="{{ post.url | relative_url }}" class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase">
+            <span>{{ post.division | default: "Adult League" }}</span>
+            <span class="text-gray-400">{{ post.date | date: "%B %d, %Y" }}</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+            {{ post.title }}
+          </h3>
+        </div>
+      </a>
+    {% else %}
+      <div class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+        <p class="text-gray-400 font-medium italic">No articles found. Sync the server to generate reports!</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
