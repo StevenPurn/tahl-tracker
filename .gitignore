@@ -1,0 +1,16 @@
+# Jekyll defaults
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Ruby/Bundler
+# We ignore Gemfile.lock on Windows/Ruby 4.0 to avoid platform conflicts in GH Actions
+Gemfile.lock
+
+# OS Files
+Thumbs.db
+desktop.ini
+
+# Agent mockups
+.superpowers/
