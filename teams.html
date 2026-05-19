@@ -1,1 +1,81 @@
----`nlayout: default`ntitle: "Team Articles"`n---`n`n<div id="team-selector" class="max-w-4xl mx-auto">`n  <h2 class="text-2xl font-bold mb-6 flex items-center">`n    <span class="bg-blue-600 w-2 h-8 mr-3 rounded-full"></span>`n    Browse by Team`n  </h2>`n  `n  {% assign all_teams = site.posts | map: "teams" | flatten | uniq | sort %}`n  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">`n    {% for team in all_teams %}`n      <a href="?team={{ team | url_encode }}" `n         class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-600 uppercase tracking-wide text-sm">`n        {{ team }}`n      </a>`n    {% endfor %}`n  </div>`n</div>`n`n<div id="filtered-articles" style="display: none;" class="max-w-4xl mx-auto">`n  <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">`n    <div>`n      <h2 id="selected-team-name" class="text-3xl font-black uppercase italic text-gray-800">Articles</h2>`n      <p class="text-gray-500 mt-1">Game reports and highlights</p>`n    </div>`n    <a href="teams.html" class="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center transition-colors">`n      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`n      ALL TEAMS`n    </a>`n  </div>`n`n  <div id="article-list" class="space-y-6">`n    {% for post in site.posts %}`n      <div class="game-article bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer" `n           data-teams='{{ post.teams | jsonify }}'`n           onclick="window.location='{{ post.url | relative_url }}'">`n        <div class="p-6">`n          <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase">`n            <span>{{ post.division | default: "Division" }}</span>`n            <span class="text-gray-400">{{ post.date | date: "%B %d, %Y" }}</span>`n          </div>`n          <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">`n            {{ post.title }}`n          </h3>`n          <p class="text-gray-600 text-sm line-clamp-2">`n            Read the full report from the rink.`n          </p>`n        </div>`n      </div>`n    {% endfor %}`n  </div>`n</div>`n`n<script>`n  const urlParams = new URLSearchParams(window.location.search);`n  const selectedTeam = urlParams.get('team');`n`n  if (selectedTeam) {`n    document.getElementById('team-selector').style.display = 'none';`n    document.getElementById('filtered-articles').style.display = 'block';`n    document.getElementById('selected-team-name').innerText = selectedTeam.toUpperCase();`n`n    const articles = document.querySelectorAll('.game-article');`n    let found = false;`n    articles.forEach(article => {`n      const teamsStr = article.getAttribute('data-teams');`n      if (teamsStr) {`n        const teams = JSON.parse(teamsStr);`n        if (teams.includes(selectedTeam)) {`n          article.style.display = 'block';`n          found = true;`n        } else {`n          article.style.display = 'none';`n        }`n      }`n    });`n  }`n</script>
+---
+layout: default
+title: "Team Articles"
+---
+
+<div id="team-selector" class="max-w-4xl mx-auto">
+  <h2 class="text-2xl font-bold mb-6 flex items-center">
+    <span class="bg-blue-600 w-2 h-8 mr-3 rounded-full"></span>
+    Browse by Team
+  </h2>
+  
+  {% assign all_teams = site.posts | map: "teams" | flatten | uniq | sort %}
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    {% for team in all_teams %}
+      <a href="?team={{ team | url_encode }}" 
+         class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-600 uppercase tracking-wide text-sm">
+        {{ team }}
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div id="filtered-articles" style="display: none;" class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+    <div>
+      <h2 id="selected-team-name" class="text-3xl font-black uppercase italic text-gray-800">Articles</h2>
+      <p class="text-gray-500 mt-1">Game reports and highlights</p>
+    </div>
+    <a href="teams.html" class="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center transition-colors">
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      ALL TEAMS
+    </a>
+  </div>
+
+  <div id="article-list" class="space-y-6">
+    {% for post in site.posts %}
+      <div class="game-article bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer" 
+           data-teams='{{ post.teams | jsonify }}'
+           onclick="window.location='{{ post.url | relative_url }}'">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase">
+            <span>{{ post.division | default: "Division" }}</span>
+            <span class="text-gray-400">{{ post.date | date: "%B %d, %Y" }}</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+            {{ post.title }}
+          </h3>
+          <p class="text-gray-600 text-sm line-clamp-2">
+            Read the full report from the rink.
+          </p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedTeam = urlParams.get('team');
+
+  if (selectedTeam) {
+    document.getElementById('team-selector').style.display = 'none';
+    document.getElementById('filtered-articles').style.display = 'block';
+    document.getElementById('selected-team-name').innerText = selectedTeam.toUpperCase();
+
+    const articles = document.querySelectorAll('.game-article');
+    let found = false;
+    articles.forEach(article => {
+      const teamsStr = article.getAttribute('data-teams');
+      if (teamsStr) {
+        const teams = JSON.parse(teamsStr);
+        if (teams.includes(selectedTeam)) {
+          article.style.display = 'block';
+          found = true;
+        } else {
+          article.style.display = 'none';
+        }
+      }
+    });
+  }
+</script>
