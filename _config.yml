@@ -1,4 +1,4 @@
 title: TAHL Tracker
-baseurl: ''
-url: ''
+baseurl: '/tahl-tracker'
+url: 'https://stevenpurn.github.io'
 markdown: kramdown
