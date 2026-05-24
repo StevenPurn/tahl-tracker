@@ -8,14 +8,34 @@ title: "Team Articles"
     <span class="bg-blue-600 w-2 h-8 mr-3 rounded-full"></span>
     Browse by Team
   </h2>
+
+  <!-- Search input box -->
+  <div class="mb-6">
+    <input type="text" id="team-search" placeholder="Search teams..." 
+           class="w-full bg-white px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm font-medium text-gray-700 placeholder-gray-400">
+  </div>
   
-  {% assign all_teams = site.posts | map: "teams" | flatten | uniq | sort %}
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    {% for team in all_teams %}
-      <a href="?team={{ team | url_encode }}" 
-         class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-600 uppercase tracking-wide text-sm">
-        {{ team }}
-      </a>
+  {% assign all_divisions = site.posts | map: "division" | uniq | sort %}
+  <div id="team-container" class="space-y-8">
+    {% for division in all_divisions %}
+      {% assign division_posts = site.posts | where: "division", division %}
+      {% assign division_teams = division_posts | map: "teams" | flatten | uniq | sort %}
+      {% if division_teams.size > 0 %}
+        <div class="division-section">
+          <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center">
+            <span class="bg-blue-600 w-1.5 h-4 mr-2 rounded-full"></span>
+            {{ division }}
+          </h3>
+          <div class="team-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {% for team in division_teams %}
+              <a href="?team={{ team | url_encode }}" 
+                 class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-600 uppercase tracking-wide text-sm">
+                {{ team }}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     {% endfor %}
   </div>
 </div>
@@ -77,5 +97,36 @@ title: "Team Articles"
         }
       }
     });
+  } else {
+    // Live search functionality when on the team selector page
+    const searchInput = document.getElementById('team-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const divisionSections = document.querySelectorAll('.division-section');
+        
+        divisionSections.forEach(section => {
+          const teamLinks = section.querySelectorAll('.team-grid a');
+          let hasVisibleTeams = false;
+          
+          teamLinks.forEach(link => {
+            const teamName = link.textContent.toLowerCase();
+            if (teamName.includes(query)) {
+              link.style.display = 'block';
+              hasVisibleTeams = true;
+            } else {
+              link.style.display = 'none';
+            }
+          });
+          
+          // Hide the entire division section if no teams match
+          if (hasVisibleTeams) {
+            section.style.display = 'block';
+          } else {
+            section.style.display = 'none';
+          }
+        });
+      });
+    }
   }
 </script>
