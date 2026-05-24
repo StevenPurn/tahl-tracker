@@ -9,7 +9,7 @@ title: "Latest News"
     <div class="flex flex-wrap items-center gap-3">
       <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">View by:</span>
       <a href="divisions.html" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors uppercase tracking-tight">
-        Divisions
+        Division
       </a>
       <a href="date.html" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors uppercase tracking-tight">
         Date
