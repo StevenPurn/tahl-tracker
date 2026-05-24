@@ -2,3 +2,10 @@ title: TAHL Tracker
 baseurl: '/tahl-tracker'
 url: 'https://stevenpurn.github.io'
 markdown: kramdown
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "default"
