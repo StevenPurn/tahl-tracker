@@ -14,3 +14,10 @@ desktop.ini
 
 # Agent mockups
 .superpowers/
+
+# Node.js
+node_modules/
+
+# Local Tailwind compiled styles (built dynamically in CI)
+assets/css/main.css
+

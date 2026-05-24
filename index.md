@@ -4,7 +4,7 @@ title: "Latest News"
 ---
 
 <div class="max-w-4xl mx-auto">
-  <div class="mb-8 pb-4 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <h2 class="!border-b-0 !pb-0 text-3xl font-black uppercase italic text-gray-800">Latest Game Reports</h2>
     <div class="flex flex-wrap items-center gap-3">
       <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">View by:</span>

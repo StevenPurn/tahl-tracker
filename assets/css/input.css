@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Typography Setup */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Oswald', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Custom Markdown Article Styles */
+.article-content h1 {
+  @apply text-4xl md:text-5xl font-black uppercase italic mb-8 leading-none text-gray-900 tracking-tighter;
+}
+.article-content h2 {
+  @apply text-2xl md:text-3xl font-extrabold mt-12 mb-6 text-blue-900 uppercase tracking-tight border-b-2 border-blue-100 pb-2;
+}
+.article-content h3 {
+  @apply text-xl md:text-2xl font-bold mt-8 mb-4 text-blue-800;
+}
+.article-content p {
+  @apply text-lg mb-6 text-gray-800 leading-relaxed;
+}
+.article-content ul {
+  @apply list-disc list-outside ml-6 mb-6 space-y-2 text-gray-800 text-lg;
+}
+.article-content li {
+  @apply pl-2;
+}
+.article-content strong {
+  @apply font-bold text-gray-900;
+}
