@@ -3,17 +3,31 @@ layout: default
 title: "Articles by Date"
 ---
 
+{% assign all_seasons = site.posts | map: "season" | compact | uniq %}
+{% assign latest_season = all_seasons | first %}
+
+<div class="max-w-4xl mx-auto mb-6 flex items-center justify-end">
+  <label for="season-select" class="text-xs font-bold text-gray-400 uppercase tracking-wide mr-3">Season</label>
+  <select id="season-select"
+    class="bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 px-4 py-2.5 focus:outline-none focus:border-blue-900">
+    {% for season in all_seasons %}
+    <option value="{{ season }}">{{ season }}</option>
+    {% endfor %}
+  </select>
+</div>
+
 <div id="team-selector" class="max-w-4xl mx-auto">
   <h2 class="text-2xl font-bold mb-6 flex items-center">
-    <span class="bg-blue-600 w-2 h-8 mr-3 rounded-full"></span>
+    <span class="bg-blue-900 w-2 h-8 mr-3 rounded-full"></span>
     Browse by Date
   </h2>
-
-  {% assign all_dates = site.posts | map: "date" | uniq | sort | reverse %}
+  {% assign all_dates = site.posts | map: "date" | compact | uniq | sort | reverse %}
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     {% for date in all_dates %}
-    <a href="?date={{ date | date: '%Y-%m-%d' }}"
-      class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-600 uppercase tracking-wide text-sm">
+    {% assign date_posts = site.posts | where_exp: "post", "post.date == date" %}
+    {% assign date_seasons = date_posts | map: "season" | compact | uniq | join: "," %}
+    <a href="?date={{ date | date: '%Y-%m-%d' }}" data-seasons="{{ date_seasons }}"
+      class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-900 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-900 uppercase tracking-wide text-sm">
       {{ date | date: "%B %d, %Y" }}
     </a>
     {% endfor %}
@@ -26,7 +40,7 @@ title: "Articles by Date"
       <h2 id="selected-date-name" class="text-3xl font-black uppercase italic text-gray-800">Articles</h2>
       <p class="text-gray-500 mt-1">Game reports and highlights</p>
     </div>
-    <a href="date.html" class="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center transition-colors">
+    <a href="date.html" class="text-sm font-bold text-blue-900 hover:text-blue-700 flex items-center transition-colors">
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
@@ -37,19 +51,30 @@ title: "Articles by Date"
   <div id="article-list" class="space-y-6">
     {% for post in site.posts %}
     <div
-      class="game-article bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-      data-date='{{ post.date | date: "%Y-%m-%d" }}' onclick="window.location='{{ post.url | relative_url }}'">
+      class="game-article group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-blue-200 transition-all cursor-pointer"
+      data-date='{{ post.date | date: "%Y-%m-%d" }}' data-season="{{ post.season }}"
+      onclick="window.location='{{ post.url | relative_url }}'">
       <div class="p-6">
-        <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-600 uppercase">
-          <span>{{ post.division | default: "Division" }}</span>
-          <span class="text-gray-400">{{ post.date | date: "%B %d, %Y" }}</span>
+        <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-900 uppercase">
+          <div class="flex items-center">
+            <span>{{ post.division | default: "Division" }}</span>
+            {% if post.season %}
+            <span class="text-gray-300 mx-1">&bull;</span>
+            <span class="text-gray-400 font-medium normal-case tracking-normal">{{ post.season }}</span>
+            {% endif %}
+          </div>
+          <span class="text-gray-400 font-medium normal-case tracking-normal">{{ post.date | date: "%B %d, %Y" }}</span>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+
+        <h3 class="text-2xl font-bold text-gray-900 mb-1 leading-snug group-hover:text-blue-900 transition-colors">
           {{ post.title }}
         </h3>
-        <p class="text-gray-600 text-sm line-clamp-2">
-          Read the full report from the rink.
+
+        {% if post.teams %}
+        <p class="text-sm font-medium text-gray-500 mt-1">
+          {{ post.teams | join: " vs " }}
         </p>
+        {% endif %}
       </div>
     </div>
     {% endfor %}
@@ -57,26 +82,48 @@ title: "Articles by Date"
 </div>
 
 <script>
+  const allSeasons = {{ all_seasons | jsonify }};
+  const latestSeason = "{{ latest_season }}";
+  let selectedSeason = sessionStorage.getItem('tahlSelectedSeason') || latestSeason;
+  if (!allSeasons.includes(selectedSeason)) selectedSeason = latestSeason;
+
+  const seasonSelect = document.getElementById('season-select');
+  seasonSelect.value = selectedSeason;
+
+  function applyFilters() {
+    document.querySelectorAll('#team-selector a[data-seasons]').forEach(el => {
+      const seasons = el.getAttribute('data-seasons').split(',');
+      el.style.display = seasons.includes(selectedSeason) ? 'block' : 'none';
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedDate = urlParams.get('date');
+    if (selectedDate) {
+      document.querySelectorAll('.game-article').forEach(article => {
+        const matchesDate = article.getAttribute('data-date') === selectedDate;
+        const matchesSeason = article.getAttribute('data-season') === selectedSeason;
+        article.style.display = (matchesDate && matchesSeason) ? 'block' : 'none';
+      });
+    }
+  }
+
+  seasonSelect.addEventListener('change', (e) => {
+    selectedSeason = e.target.value;
+    sessionStorage.setItem('tahlSelectedSeason', selectedSeason);
+    applyFilters();
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   const selectedDate = urlParams.get('date');
 
   if (selectedDate) {
     document.getElementById('team-selector').style.display = 'none';
     document.getElementById('filtered-articles').style.display = 'block';
-    
-    // Format the date for the header
+
     const dateObj = new Date(selectedDate + 'T00:00:00');
     const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     document.getElementById('selected-date-name').innerText = formattedDate;
-
-    const articles = document.querySelectorAll('.game-article');
-    articles.forEach(article => {
-      const dateStr = article.getAttribute('data-date');
-      if (dateStr === selectedDate) {
-        article.style.display = 'block';
-      } else {
-        article.style.display = 'none';
-      }
-    });
   }
+
+  applyFilters();
 </script>

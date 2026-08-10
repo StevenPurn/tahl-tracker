@@ -1,46 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page.title }} | TAHL Tracker</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏒</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏒</text></svg>">
 
   <!-- Open Graph / Facebook Previews -->
   <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}TAHL Tracker{% endif %}">
-  <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}AI-generated game recaps and articles for the Tulsa Adult Hockey League.{% endif %}">
+  <meta property="og:description"
+    content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}AI-generated game recaps and articles for the Tulsa Adult Hockey League.{% endif %}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
-  
+
   <!-- Twitter Card Previews -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}TAHL Tracker{% endif %}">
-  <meta name="twitter:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}AI-generated game recaps and articles for the Tulsa Adult Hockey League.{% endif %}">
+  <meta name="twitter:description"
+    content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}AI-generated game recaps and articles for the Tulsa Adult Hockey League.{% endif %}">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
   <!-- Static compiled Tailwind CSS -->
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
+
 <body class="bg-gray-50 text-gray-900">
   <header class="bg-blue-900 text-white py-6 shadow-lg">
     <div class="container mx-auto px-4">
-      <h1 class="text-3xl font-black uppercase italic tracking-tight"><a href="{{ '/' | relative_url }}">CENTER OF THE HOCKEYVERSE</a></h1>
+      <h1 class="text-3xl font-black uppercase italic tracking-tight"><a href="{{ '/' | relative_url }}">CENTER OF THE
+          HOCKEYVERSE</a></h1>
       <p class="text-blue-200 mt-1 uppercase text-sm tracking-widest">The Only Spot in Tulsa where an Echo is a Goal</p>
     </div>
   </header>
+
   <main class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto article-content">
-      {{ content }}
+
+      {% if page.teams %}
+      <header class="mb-8 pb-6 border-b border-gray-200">
+        {% if page.division %}
+        <span
+          class="inline-block bg-blue-900 text-white text-xs font-bold uppercase tracking-wide px-4 py-1.5 rounded-full mb-4">
+          {{ page.division }}
+        </span>
+        {% endif %}
+
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 leading-tight mb-4">
+          {{ page.title }}
+        </h2>
+
+        <div class="flex flex-wrap items-center gap-y-1 text-sm text-gray-500">
+          {% if page.date %}
+          <span>{{ page.date | date: "%B %-d, %Y" }}</span>
+          {% endif %}
+          {% if page.author %}
+          <span class="text-gray-300 mx-1">&bull;</span>
+          <span>By {{ page.author }}</span>
+          {% endif %}
+          {% if page.season %}
+          <span class="text-gray-300 mx-1">&bull;</span>
+          <span>{{ page.season }}</span>
+          {% endif %}
+          {% if page.teams %}
+          <span class="text-gray-300 mx-1">&bull;</span>
+          <span class="font-semibold text-gray-700">{{ page.teams | join: " vs " }}</span>
+          {% endif %}
+        </div>
+      </header>
+      {% endif %}
+
+      <div class="post-body">
+        {{ content }}
+      </div>
     </div>
   </main>
+
+  {% if page.teams %}
+  <script>
+    // The post markdown always starts with its own "# Title" heading, which
+    // now duplicates the title the layout renders above. Strip the first
+    // heading in the post body (not the layout header) if it matches the page title.
+    document.addEventListener('DOMContentLoaded', function () {
+      const postBody = document.querySelector('.post-body');
+      if (!postBody) return;
+      const firstHeading = postBody.querySelector('h1, h2, h3');
+      if (!firstHeading) return;
+
+      const pageTitle = {{ page.title | jsonify
+    }}.trim().toLowerCase();
+    if (firstHeading.textContent.trim().toLowerCase() === pageTitle) {
+      firstHeading.remove();
+    }
+    });
+  </script>
+  {% endif %}
+
   <footer class="border-t border-gray-200 py-8 mt-12">
     <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
       &copy; 2026 TAHL Tracker. All rights reserved.
     </div>
   </footer>
 </body>
+
 </html>

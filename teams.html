@@ -3,6 +3,19 @@ layout: default
 title: "Team Articles"
 ---
 
+{% assign all_seasons = site.posts | map: "season" | compact | uniq %}
+{% assign latest_season = all_seasons | first %}
+
+<div class="max-w-4xl mx-auto mb-6 flex items-center justify-end">
+  <label for="season-select" class="text-xs font-bold text-gray-400 uppercase tracking-wide mr-3">Season</label>
+  <select id="season-select"
+    class="bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 px-4 py-2.5 focus:outline-none focus:border-blue-900">
+    {% for season in all_seasons %}
+    <option value="{{ season }}">{{ season }}</option>
+    {% endfor %}
+  </select>
+</div>
+
 <div id="team-selector" class="max-w-4xl mx-auto">
   <h2 class="text-2xl font-bold mb-6 flex items-center">
     <span class="bg-blue-900 w-2 h-8 mr-3 rounded-full"></span>
@@ -11,31 +24,33 @@ title: "Team Articles"
 
   <!-- Search input box -->
   <div class="mb-6">
-    <input type="text" id="team-search" placeholder="Search teams..." 
-           class="w-full bg-white px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 transition-all text-sm font-medium text-gray-700 placeholder-gray-400">
+    <input type="text" id="team-search" placeholder="Search teams..."
+      class="w-full bg-white px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 transition-all text-sm font-medium text-gray-700 placeholder-gray-400">
   </div>
-  
+
   {% assign all_divisions = site.posts | map: "division" | compact | uniq | sort %}
   <div id="team-container" class="space-y-8">
     {% for division in all_divisions %}
-      {% assign division_posts = site.posts | where: "division", division %}
-      {% assign division_teams = division_posts | map: "teams" | flatten | compact | uniq | sort %}
-      {% if division_teams.size > 0 %}
-        <div class="division-section">
-          <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center">
-            <span class="bg-blue-900 w-1.5 h-4 mr-2 rounded-full"></span>
-            {{ division }}
-          </h3>
-          <div class="team-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {% for team in division_teams %}
-              <a href="?team={{ team | url_encode }}" 
-                 class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-900 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-900 uppercase tracking-wide text-sm">
-                {{ team }}
-              </a>
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
+    {% assign division_posts = site.posts | where: "division", division %}
+    {% assign division_teams = division_posts | map: "teams" | flatten | compact | uniq | sort %}
+    {% if division_teams.size > 0 %}
+    <div class="division-section">
+      <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center">
+        <span class="bg-blue-900 w-1.5 h-4 mr-2 rounded-full"></span>
+        {{ division }}
+      </h3>
+      <div class="team-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for team in division_teams %}
+        {% assign team_posts = division_posts | where_exp: "post", "post.teams contains team" %}
+        {% assign team_seasons = team_posts | map: "season" | compact | uniq | join: "," %}
+        <a href="?team={{ team | url_encode }}" data-seasons="{{ team_seasons }}"
+          class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-900 hover:shadow-md transition-all text-center font-medium text-gray-700 hover:text-blue-900 uppercase tracking-wide text-sm">
+          {{ team }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
     {% endfor %}
   </div>
 </div>
@@ -46,54 +61,95 @@ title: "Team Articles"
       <h2 id="selected-team-name" class="text-3xl font-black uppercase italic text-gray-800">Articles</h2>
       <p class="text-gray-500 mt-1">Game reports and highlights</p>
     </div>
-    <a href="teams.html" class="text-sm font-bold text-blue-900 hover:text-blue-700 flex items-center transition-colors">
-      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    <a href="teams.html"
+      class="text-sm font-bold text-blue-900 hover:text-blue-700 flex items-center transition-colors">
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
       ALL TEAMS
     </a>
   </div>
 
   <div id="article-list" class="space-y-6">
     {% for post in site.posts %}
-      <div class="game-article group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-blue-200 transition-all cursor-pointer" 
-           data-teams='{{ post.teams | jsonify }}'
-           onclick="window.location='{{ post.url | relative_url }}'">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-900 uppercase">
-            <div class="flex items-center gap-2">
-              <span>{{ post.division | default: "Division" }}</span>
-              {% if post.season %}
-              <span class="text-gray-300">&bull;</span>
-              <span class="text-gray-400 font-medium normal-case tracking-normal">{{ post.season }}</span>
-              {% endif %}
-            </div>
-            <span class="text-gray-400 font-medium normal-case tracking-normal">{{ post.date | date: "%B %d, %Y" }}</span>
-          </div>
-
-          {% if post.teams %}
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
-            {{ post.teams | join: " vs " }}
-          </p>
-          {% endif %}
-
-          <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-900 transition-colors">
-            {{ post.title }}
-          </h3>
-
-          <div class="flex items-center justify-between mt-3">
-            <p class="text-gray-600 text-sm line-clamp-2">
-              Read the full report from the rink.
-            </p>
-            {% if post.author %}
-            <span class="text-xs text-gray-400 whitespace-nowrap ml-4">by {{ post.author }}</span>
+    <div
+      class="game-article group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-blue-200 transition-all cursor-pointer"
+      data-teams='{{ post.teams | jsonify }}' data-season="{{ post.season }}"
+      onclick="window.location='{{ post.url | relative_url }}'">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-3 text-xs font-bold tracking-widest text-blue-900 uppercase">
+          <div class="flex items-center">
+            <span>{{ post.division | default: "Division" }}</span>
+            {% if post.season %}
+            <span class="text-gray-300 mx-1">&bull;</span>
+            <span class="text-gray-400 font-medium normal-case tracking-normal">{{ post.season }}</span>
             {% endif %}
           </div>
+          <span class="text-gray-400 font-medium normal-case tracking-normal">{{ post.date | date: "%B %d, %Y" }}</span>
         </div>
+
+        <h3 class="text-2xl font-bold text-gray-900 mb-1 leading-snug group-hover:text-blue-900 transition-colors">
+          {{ post.title }}
+        </h3>
+
+        {% if post.teams %}
+        <p class="text-sm font-medium text-gray-500 mt-1">
+          {{ post.teams | join: " vs " }}
+        </p>
+        {% endif %}
       </div>
+    </div>
     {% endfor %}
   </div>
 </div>
 
 <script>
+  const allSeasons = {{ all_seasons | jsonify }};
+  const latestSeason = "{{ latest_season }}";
+  let selectedSeason = sessionStorage.getItem('tahlSelectedSeason') || latestSeason;
+  if (!allSeasons.includes(selectedSeason)) selectedSeason = latestSeason;
+
+  const seasonSelect = document.getElementById('season-select');
+  seasonSelect.value = selectedSeason;
+
+  function updateDivisionVisibility() {
+    document.querySelectorAll('.division-section').forEach(section => {
+      const visibleTeams = section.querySelectorAll('.team-grid a[style*="display: block"], .team-grid a:not([style])');
+      const anyVisible = Array.from(section.querySelectorAll('.team-grid a')).some(a => a.style.display !== 'none');
+      section.style.display = anyVisible ? 'block' : 'none';
+    });
+  }
+
+  function applyFilters() {
+    const query = (document.getElementById('team-search').value || '').toLowerCase().trim();
+
+    document.querySelectorAll('.team-grid a[data-seasons]').forEach(el => {
+      const seasons = el.getAttribute('data-seasons').split(',');
+      const matchesSeason = seasons.includes(selectedSeason);
+      const matchesSearch = el.textContent.toLowerCase().includes(query);
+      el.style.display = (matchesSeason && matchesSearch) ? 'block' : 'none';
+    });
+    updateDivisionVisibility();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedTeam = urlParams.get('team');
+    if (selectedTeam) {
+      document.querySelectorAll('.game-article').forEach(article => {
+        const teamsStr = article.getAttribute('data-teams');
+        const teams = teamsStr ? JSON.parse(teamsStr) : [];
+        const matchesTeam = teams.includes(selectedTeam);
+        const matchesSeason = article.getAttribute('data-season') === selectedSeason;
+        article.style.display = (matchesTeam && matchesSeason) ? 'block' : 'none';
+      });
+    }
+  }
+
+  seasonSelect.addEventListener('change', (e) => {
+    selectedSeason = e.target.value;
+    sessionStorage.setItem('tahlSelectedSeason', selectedSeason);
+    applyFilters();
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   const selectedTeam = urlParams.get('team');
 
@@ -101,51 +157,12 @@ title: "Team Articles"
     document.getElementById('team-selector').style.display = 'none';
     document.getElementById('filtered-articles').style.display = 'block';
     document.getElementById('selected-team-name').innerText = selectedTeam.toUpperCase();
-
-    const articles = document.querySelectorAll('.game-article');
-    let found = false;
-    articles.forEach(article => {
-      const teamsStr = article.getAttribute('data-teams');
-      if (teamsStr) {
-        const teams = JSON.parse(teamsStr);
-        if (teams.includes(selectedTeam)) {
-          article.style.display = 'block';
-          found = true;
-        } else {
-          article.style.display = 'none';
-        }
-      }
-    });
   } else {
-    // Live search functionality when on the team selector page
     const searchInput = document.getElementById('team-search');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        const divisionSections = document.querySelectorAll('.division-section');
-        
-        divisionSections.forEach(section => {
-          const teamLinks = section.querySelectorAll('.team-grid a');
-          let hasVisibleTeams = false;
-          
-          teamLinks.forEach(link => {
-            const teamName = link.textContent.toLowerCase();
-            if (teamName.includes(query)) {
-              link.style.display = 'block';
-              hasVisibleTeams = true;
-            } else {
-              link.style.display = 'none';
-            }
-          });
-          
-          // Hide the entire division section if no teams match
-          if (hasVisibleTeams) {
-            section.style.display = 'block';
-          } else {
-            section.style.display = 'none';
-          }
-        });
-      });
+      searchInput.addEventListener('input', applyFilters);
     }
   }
+
+  applyFilters();
 </script>
